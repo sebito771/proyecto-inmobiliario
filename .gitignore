@@ -1,0 +1,19 @@
+# Variables de entorno , entornos virtuales
+.venv
+.env
+env/
+venv/
+
+# IDEs
+*/vscode
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+
+# Logs
+logs
+*.log
+*.golden
+
