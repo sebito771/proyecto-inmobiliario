@@ -1,3 +1,4 @@
+
 DROP DATABASE IF EXISTS sistema_inmobiliario;
 CREATE DATABASE sistema_inmobiliario;
 USE sistema_inmobiliario;
@@ -147,6 +148,3 @@ CREATE TABLE pqrs (
 INSERT INTO pqrs (usuario_id, tipo, descripcion) VALUES
 (2,'Peticion','Solicito informacion sobre mi saldo'),
 (3,'Queja','No he recibido mi comprobante');
-
-
-	
