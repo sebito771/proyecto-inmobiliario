@@ -1,0 +1,13 @@
+FastAPI
+uvicorn
+sqlalchemy
+pydantic
+python-dotenv
+bcrypt
+passlib
+databases
+asyncpg
+pytest
+httpx
+python-jose[cryptography]
+pymysql
