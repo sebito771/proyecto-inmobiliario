@@ -22,6 +22,7 @@ CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    activo BOOLEAN DEFAULT FALSE,
     password VARCHAR(255) NOT NULL, -- preparado para bcrypt
     rol_id INT NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -30,10 +31,10 @@ CREATE TABLE usuarios (
         ON UPDATE CASCADE
 );
 
-INSERT INTO usuarios (nombre, email, password, rol_id) VALUES
-('Admin Sistema', 'admin@inmobiliaria.com', 'hash_admin', 1),
-('Juan Perez', 'juan@email.com', 'hash_juan', 2),
-('Maria Lopez', 'maria@email.com', 'hash_maria', 2);
+INSERT INTO usuarios (nombre, email, password, rol_id, activo) VALUES
+('Admin Sistema', 'admin@inmobiliaria.com', 'hash_admin', 1, TRUE),
+('Juan Perez', 'juan@email.com', 'hash_juan', 2, TRUE),
+('Maria Lopez', 'maria@email.com', 'hash_maria', 2, TRUE);
 
 -- =========================
 -- ETAPAS
