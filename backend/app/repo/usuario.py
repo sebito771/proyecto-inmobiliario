@@ -13,6 +13,8 @@ class UsuarioRepository(BaseRepository[UsuarioModel]):
     
     def activate_user(self, usuario_id: int) -> UsuarioModel:
         db_usuario = self.db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).first()
+        if db_usuario.activo:
+            return db_usuario
         db_usuario.activo = True
         self.db.commit()
         self.db.refresh(db_usuario)
