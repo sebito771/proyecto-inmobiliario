@@ -1,20 +1,10 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
-from app.models.usuario import Usuario
-from app.schemas.usuario import UsuarioCreate
-from app.core.security import hash_password
+from app.services.usuario import UsuarioServices
+from app.repo.usuario import UsuarioRepository
 
-def get_current_user(db: Session, user_id: int):
-    user = db.query(Usuario).filter(Usuario.id == user_id).first()
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-def create_user_dependency(user: UsuarioCreate, db: Session = Depends(get_db)):
-    hashed_password = hash_password(user.password)
-    db_user = Usuario(nombre=user.nombre, email=user.email, password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+def get_usuario_service(db: Session = Depends(get_db)) -> UsuarioServices:
+    """Provee una instancia del servicio lista para usar en los endpoints."""
+    repo = UsuarioRepository(db)
+    return UsuarioServices(repo)
