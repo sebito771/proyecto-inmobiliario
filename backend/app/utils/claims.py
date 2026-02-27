@@ -12,13 +12,3 @@ def get_claims(db_usuario: Usuario)-> dict:
         "type": "access",
     }
 
-
-def get_verification_claims(db_usuario: Usuario) -> dict:
-    """
-    Genera los claims para un token de verificación de email.
-    """
-    return {
-        "sub": str(db_usuario.id),
-        "email": db_usuario.email,
-        "type": "verification",
-    }
