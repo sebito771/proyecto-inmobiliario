@@ -12,3 +12,4 @@ pytest
 httpx
 python-jose[cryptography]
 pymysql
+fastapi-mail
