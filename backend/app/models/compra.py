@@ -14,7 +14,7 @@ class Compra(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
-    fecha_compra = Column(DateTime, default=datetime.utcnow)
+    fecha_compra = Column(DateTime, default=datetime.timezone.utcnow)
     total = Column(Numeric(12, 2), nullable=False)
     estado = Column(Enum(CompraEstado), default=CompraEstado.Activa)
 
