@@ -32,7 +32,7 @@ async def send_verification_email(
         recipients=[email],
         body=(
             f"<strong>Haz click aquí para verificar:</strong> "
-            f"<a href=\"{BASE_URL}/verify?token={token}\">Link</a>"
+            f"<a href=\"{BASE_URL}/auth/verify?token={token}\">Link</a>"
         ),
         subtype="html",
     )
