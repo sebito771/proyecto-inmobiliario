@@ -13,7 +13,9 @@ class LoteCreate(LoteBase):
     pass
 
 class LoteUpdate(LoteBase):
-    pass
+    valor: Optional[Decimal] = None
+    estado: Optional[str] = None
+
 
 class Lote(LoteBase):
     id: int
