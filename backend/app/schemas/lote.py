@@ -16,6 +16,9 @@ class LoteUpdate(LoteBase):
     valor: Optional[Decimal] = None
     estado: Optional[str] = None
 
+class LoteSell(BaseModel):
+    usuario_id: int
+    lote_id: list[int]
 
 class Lote(LoteBase):
     id: int
