@@ -79,6 +79,7 @@ CREATE TABLE compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_expiracion TIMESTAMP NOT NULL,
     total DECIMAL(12,2) NOT NULL,
     estado ENUM('Activa','Pagada','Cancelada') DEFAULT 'Activa',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
