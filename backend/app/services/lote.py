@@ -37,6 +37,7 @@ class LoteServices:
             raise HTTPException(status_code=400, detail="User not active")
 
         # 2. Verificación de Disponibilidad 🏗️
+        self._clean_expired_purchases()
         for lote_id in sell.lote_id:
             lote = self.repo.get_by_id(lote_id)
             if not lote:
@@ -103,6 +104,7 @@ class LoteServices:
      """
     Lista los lotes con filtros opcionales por estado y etapa. 🔍
      """
+     self._clean_expired_purchases()
     # verificamos que exista la etapa
      if etapa_id:
         etapa = self.etapa_repo.get_by_id(etapa_id)
@@ -111,7 +113,35 @@ class LoteServices:
      
      return self.repo.list_filtered(estado, etapa_id)
     
-         
-     
+   
+    def _clean_expired_purchases(self):
+     """
+    Busca todas las compras expiradas usando el repo y las cancela.
+     """
+     ahora = datetime.now(datetime.timezone.utc)
     
-    
+    # 1. Usamos el repo para traer solo las que debemos limpiar
+     expired_purchases = self.compra_repo.get_expired_active(ahora)
+
+     if not expired_purchases:
+        return 
+
+
+     try:
+        with self.db.begin():
+            for compra in expired_purchases:
+                #  Obtenemos detalles mediante el repo de detalles
+                detalles = self.detalle_repo.get_by_compra_id(compra.id)
+                
+                for item in detalles:
+                    lote = self.repo.get_by_id(item.lote_id)
+                    if lote and lote.estado == "Reservado":
+                  
+                        self.repo.update_without_commit(lote, {"estado": "Disponible"})
+                
+                # 4. Cancelamos la compra
+                self.compra_repo.update_without_commit(compra, {"estado": "Cancelada"})
+                
+     except Exception as e:
+        # Aquí puedes loguear el error, pero no bloqueamos al usuario
+        print(f"Error en auto-limpieza: {e}")
