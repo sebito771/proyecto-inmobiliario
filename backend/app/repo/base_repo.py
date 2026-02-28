@@ -21,6 +21,11 @@ class BaseRepository(Generic[ModelType]):
         self.db.commit()
         self.db.refresh(obj_in)
         return obj_in
+    
+    def create_without_commit(self, obj_in: ModelType) -> ModelType:
+        self.db.add(obj_in)
+        return obj_in
+
 
     def update(self, db_obj: ModelType, updates: dict) -> ModelType:
         for field in updates:
@@ -28,7 +33,17 @@ class BaseRepository(Generic[ModelType]):
         self.db.commit()
         self.db.refresh(db_obj)
         return db_obj
+    
+    def update_without_commit(self, db_obj: ModelType, updates: dict) -> ModelType:
+        for field in updates:
+            setattr(db_obj, field, updates[field])
+        return db_obj
+
 
     def delete(self, db_obj: ModelType) -> None:
         self.db.delete(db_obj)
         self.db.commit()
+    
+    def delete_without_commit(self, db_obj: ModelType) -> None:
+        self.db.delete(db_obj)
+        return db_obj
