@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from app.core.config import settings
 
+
 # Security settings
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
@@ -47,11 +48,10 @@ def create_access_token(
     return encoded_jwt
 
 
-def create_verification_token(usuario_id: int, email: str) -> str:
+def create_verification_token(usuario_id: int) -> str:
     """Crea un token de verificación de email."""
     to_encode = {
         "sub": str(usuario_id),
-        "email": email,
         "type": "verification",
     }
     expire = datetime.now(timezone.utc) + timedelta(hours=VERIFICATION_TOKEN_EXPIRE_HOURS)
@@ -60,17 +60,6 @@ def create_verification_token(usuario_id: int, email: str) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def create_password_reset_token(usuario_id: int, email:str):
-    """Crea un token de restablecimiento de contraseña."""
-    now= datetime.now(timezone.utc)
-    expire= now + datetime.timedelta(minutes=15)
-    to_encode = {
-        "sub": str(usuario_id),
-        "email": email,
-        "type": "password_reset"
-    }
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     
 
