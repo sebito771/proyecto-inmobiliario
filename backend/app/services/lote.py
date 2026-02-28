@@ -61,7 +61,7 @@ class LoteServices:
                     fecha_expiracion=expiracion,
                     estado="Activa"
                 )
-                compradb = self.compra_repo.create(nueva_compra)
+                compradb = self.compra_repo.create_without_commit(nueva_compra)
 
              
                 for lote in valid_lotes:
@@ -70,7 +70,7 @@ class LoteServices:
                         lote_id=lote.id,
                         precio=lote.valor
                     )
-                    self.detalle_repo.create(detalle)
+                    self.detalle_repo.create_without_commit(detalle)
 
                     #  Actualización estratégica: Reservado
                     self.repo.update(lote, {"estado": "Reservado"})
