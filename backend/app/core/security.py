@@ -60,9 +60,22 @@ def create_verification_token(usuario_id: int, email: str) -> str:
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+def create_password_reset_token(usuario_id: int, email:str):
+    """Crea un token de restablecimiento de contraseña."""
+    now= datetime.now(timezone.utc)
+    expire= now + datetime.timedelta(minutes=15)
+    to_encode = {
+        "sub": str(usuario_id),
+        "email": email,
+        "type": "password_reset"
+    }
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    
 
 def verify_token(
-    token: str, expected_type: Literal["access", "verification"]
+    token: str, expected_type: Literal["access", "verification","password_reset"]
 ) -> Dict:
     """
     Verifica un token y valida que sea del tipo esperado.
