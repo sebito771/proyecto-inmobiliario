@@ -1,14 +1,9 @@
-from app.repo import LoteRepository , UsuarioRepository , CompraRepository , DetalleRepository
+from app.repo import LoteRepository , UsuarioRepository , CompraRepository , DetalleRepository, EtapaRepository
 from app.schemas.lote import LoteSell , LoteCreate
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.models import compra as CompraModel , lote as LoteModel , detalle_compra as DetalleModel , etapa as Etapa
-from app.models.etapas import Etapa
+from app.models import compra as CompraModel , lote as LoteModel , detalle_compra as DetalleModel 
 from datetime import datetime, timedelta
-
-
-
-
 
 
 class LoteServices:
@@ -17,13 +12,16 @@ class LoteServices:
                   user_repo:UsuarioRepository,
                   compra_repo: CompraRepository,
                   detalle_repo: DetalleRepository,
+                  etapa_repo: EtapaRepository,
                   db: Session
                  ):
         self.repo=repo
         self.user_repo=user_repo
         self.compra_repo=compra_repo
         self.detalle_repo=detalle_repo
+        self.etapa_repo=etapa_repo
         self.db=db
+        
 
     def buy_lote(self, sell: LoteSell):
         """
@@ -85,10 +83,10 @@ class LoteServices:
         
     def create_lote(self, lote_data: LoteCreate):
     # 1. Verificar si la etapa existe 🔍
-     etapa = self.db.query(Etapa).filter(Etapa.id == lote_data.etapa_id).first()
+     etapa =  self.etapa_repo.get_by_id(lote_data.etapa_id)
      if not etapa:
         raise HTTPException(status_code=404, detail="La etapa especificada no existe")
-
+     
     # 2. Crear la instancia del modelo
      nuevo_lote = LoteModel(
         area_m2=lote_data.area_m2,
@@ -105,17 +103,15 @@ class LoteServices:
      """
     Lista los lotes con filtros opcionales por estado y etapa. 🔍
      """
-    # Empezamos con la consulta base
-     query = self.db.query(LoteModel)
-
-    # Si nos pasan un estado (ej: 'Disponible'), filtramos por él 🟢
-     if estado:
-        query = query.filter(LoteModel.estado == estado)
-
-    # Si nos pasan una etapa, filtramos por ella 🚩
+    # verificamos que exista la etapa
      if etapa_id:
-        query = query.filter(LoteModel.etapa_id == etapa_id)
-
-     return query.all()
-
-
+        etapa = self.etapa_repo.get_by_id(etapa_id)
+        if not etapa:
+            raise HTTPException(status_code=404, detail="Etapa no encontrada")
+     
+     return self.repo.list_filtered(estado, etapa_id)
+    
+         
+     
+    
+    
