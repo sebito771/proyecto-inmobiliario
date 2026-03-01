@@ -47,6 +47,18 @@ def create_access_token(
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+def create_password_reset_token(usuario_id: int) -> str:
+    """Crea un token de restablecimiento de contraseña."""
+    to_encode = {
+        "sub": str(usuario_id),
+        "type": "password_reset",
+    }
+    expire = datetime.now(timezone.utc) + timedelta(hours=1)  #
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+
 
 def create_verification_token(usuario_id: int) -> str:
     """Crea un token de verificación de email."""
