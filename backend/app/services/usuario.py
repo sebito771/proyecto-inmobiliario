@@ -14,6 +14,9 @@ from app.utils.claims import get_claims
 
 invalid_credentials = HTTPException(status_code=401, detail="Invalid credentials")
 account_inactive = HTTPException(status_code=403, detail="Account is not active")
+account_not_verified = HTTPException(status_code=403, detail="Account is not verified,check your email")
+
+
 
 
 class UsuarioServices:
@@ -28,6 +31,8 @@ class UsuarioServices:
             raise invalid_credentials
         if not db_usuario.activo:
             raise account_inactive
+        if not db_usuario.is_verified:
+            raise account_not_verified
 
         data = get_claims(db_usuario)
         token = create_access_token(data)
@@ -44,7 +49,8 @@ class UsuarioServices:
             email=usuario.email,
             password=password_hash,
             rol_id=usuario.rol_id,
-            activo=False,
+            activo=True,
+            is_verified=False
         )
 
         created = self.repo.create(db_usuario)
