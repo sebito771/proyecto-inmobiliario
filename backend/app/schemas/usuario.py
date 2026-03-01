@@ -10,7 +10,6 @@ class UsuarioBase(BaseModel):
 
 class UsuarioCreate(UsuarioBase):
     password: str
-    rol_id: int
     # 'activo' no se expone al cliente; siempre comienza en False
 class UsuarioLogin(BaseModel):
     email: EmailStr
