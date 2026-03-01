@@ -3,7 +3,8 @@ from app.schemas.lote import LoteSell , LoteCreate , LoteUpdate
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models import compra as CompraModel , lote as LoteModel , detalle_compra as DetalleModel 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta , timezone
+
 
 
 class LoteServices:
@@ -53,7 +54,7 @@ class LoteServices:
             # ⚛️ Iniciamos la transacción: Todo o Nada
             with self.db.begin():
                 # Crear la cabecera de la compra 🧾
-                ahora = datetime.now(datetime.timezone.utc)
+                ahora = datetime.now(timezone.utc)
                 expiracion = ahora + timedelta(hours=24)
                 nueva_compra = CompraModel(
                     usuario_id=sell.usuario_id,
@@ -128,7 +129,7 @@ class LoteServices:
      """
     Busca todas las compras expiradas usando el repo y las cancela.
      """
-     ahora = datetime.now(datetime.timezone.utc)
+     ahora = datetime.now(timezone.utc)
     
     # 1. Usamos el repo para traer solo las que debemos limpiar
      expired_purchases = self.compra_repo.get_expired_active(ahora)
