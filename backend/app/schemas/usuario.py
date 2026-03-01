@@ -17,8 +17,8 @@ class UsuarioLogin(BaseModel):
     password: str
 
 class UsuarioResetPassword(BaseModel):
-    email: EmailStr
-    password: str
+    token: str 
+    new_password: str
 
 
 class UsuarioUpdate(BaseModel):
