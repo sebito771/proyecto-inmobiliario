@@ -1,5 +1,5 @@
 from app.repo import LoteRepository , UsuarioRepository , CompraRepository , DetalleRepository, EtapaRepository
-from app.schemas.lote import LoteSell , LoteCreate
+from app.schemas.lote import LoteSell , LoteCreate , LoteUpdate
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models import compra as CompraModel , lote as LoteModel , detalle_compra as DetalleModel 
@@ -99,6 +99,16 @@ class LoteServices:
      self.repo.create(nuevo_lote)
      return nuevo_lote
     
+    def update_lote(self, lote_id: int, updates: LoteUpdate):
+       lote= self.repo.get_by_id(lote_id)
+       if not lote:
+            raise HTTPException(status_code=404, detail="Lote no encontrado")
+       
+       update_data = updates.model_dump(exclude_unset=True)
+       self.repo.update(lote, update_data)
+       return lote
+       
+     
 
     def list_lotes(self, estado: str = None, etapa_id: int = None):
      """
