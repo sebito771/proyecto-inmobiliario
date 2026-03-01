@@ -43,3 +43,21 @@ async def send_verification_email(
     else:
         await fm.send_message(message)
 
+
+async def send_new_password_email(email: str, token: str, background_tasks: BackgroundTasks | None = None):
+    message = MessageSchema(
+        subject="Nueva contraseña",
+        recipients=[email],
+        body=(
+            f"<strong>Haz click aquí para cambiar tu contraseña:</strong> "
+            f"<a href=\"{BASE_URL}/auth/reset-password?token={token}\">Link</a>"
+        ),
+        subtype="html",
+    )
+
+    fm = FastMail(MAIL_CONFIG)
+    if background_tasks:
+        background_tasks.add_task(fm.send_message, message)
+    else:
+        await fm.send_message(message)
+
