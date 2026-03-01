@@ -27,11 +27,14 @@ class UsuarioUpdate(BaseModel):
     password: Optional[str] = None
     rol_id: Optional[int] = None
     activo: Optional[bool] = None  # permite activar/desactivar manualmente
+    is_verified: Optional[bool] = None
 
 class UsuarioInDB(UsuarioBase):
     id: int
     fecha_registro: datetime
     activo: bool = False
+    is_verified: bool = False
+
 
     model_config = ConfigDict(
         from_attributes=True
