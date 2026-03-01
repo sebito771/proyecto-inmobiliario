@@ -13,3 +13,4 @@ class Lote(Base):
     etapa_id = Column(Integer, ForeignKey('etapas.id'), nullable=False)
 
     etapa = relationship("Etapa", back_populates="lotes")
+    detalle_compras = relationship("DetalleCompra", back_populates="lote")

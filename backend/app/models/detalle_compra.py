@@ -12,4 +12,4 @@ class DetalleCompra(Base):
 
     # Relaciones para navegar fácilmente entre objetos
     compra = relationship("Compra", back_populates="detalle_compra")
-    lote = relationship("Lote")
+    lote = relationship("Lote", back_populates="detalle_compras")
