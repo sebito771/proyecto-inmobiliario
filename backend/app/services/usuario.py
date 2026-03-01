@@ -75,7 +75,12 @@ class UsuarioServices:
 
         return UsuarioInDB.model_validate(db_usuario)
     
-    
+    def get_user_by_email(self, email: str) -> UsuarioInDB:
+        db_usuario = self.repo.find_by_email(email)
+        if not db_usuario:
+            raise HTTPException(status_code=404, detail="User not found")
+        return UsuarioInDB.model_validate(db_usuario)
+        
 
     async def reset_password(self, token: str, new_password: str):
     # 1. Validamos que el token sea de tipo password_reset
