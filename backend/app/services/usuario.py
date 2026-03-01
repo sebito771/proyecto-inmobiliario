@@ -5,6 +5,7 @@ from app.core.security import (
     verify_password,
     create_access_token,
     create_verification_token,
+    verify_token
 )
 from app.repo.usuario import UsuarioRepository
 from fastapi import HTTPException
@@ -73,3 +74,21 @@ class UsuarioServices:
             raise HTTPException(status_code=404, detail="User not found")
 
         return UsuarioInDB.model_validate(db_usuario)
+    
+    
+
+    async def reset_password(self, token: str, new_password: str):
+    # 1. Validamos que el token sea de tipo password_reset
+     payload = verify_token(token, expected_type="password_reset")
+     user_id = payload.get("sub")
+    
+    # 2. Buscamos al usuario
+     user = self.repo.get_by_id(user_id)
+     if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # 3. Hasheamos la nueva clave y actualizamos
+     new_hash = hash_password(new_password)
+     self.repo.update(user, {"password": new_hash})
+    
+     return {"message": "password updated successfully"}
