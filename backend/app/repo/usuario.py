@@ -12,10 +12,14 @@ class UsuarioRepository(BaseRepository[UsuarioModel]):
         return self.db.query(UsuarioModel).filter(UsuarioModel.email == email).first()
     
     def activate_user(self, usuario_id: int) -> UsuarioModel:
-        db_usuario = self.db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).first()
-        if db_usuario.activo:
+        db_usuario = self.get_by_id(usuario_id)
+        if not db_usuario:
+            return None
+        
+        if db_usuario.is_verified:
             return db_usuario
-        db_usuario.activo = True
+        
+        db_usuario.is_verified = True
         self.db.commit()
         self.db.refresh(db_usuario)
         return db_usuario
