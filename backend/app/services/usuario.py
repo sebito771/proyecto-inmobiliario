@@ -102,3 +102,16 @@ class UsuarioServices:
      self.repo.update(user, {"password": new_hash})
     
      return {"message": "password updated successfully"}
+
+    # ------ métodos administrativos ------
+    def list_users(self):
+        """Retorna todos los usuarios junto con su rol."""
+        return self.repo.list()
+
+    def desactivar_usuario(self, usuario_id: int):
+        user = self.repo.get_by_id(usuario_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        user.activo = False
+        self.repo.update(user, {"activo": False})
+        return user
