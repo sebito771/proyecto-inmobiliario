@@ -12,9 +12,13 @@ class LoteBase(BaseModel):
 class LoteCreate(LoteBase):
     pass
 
-class LoteUpdate(LoteBase):
+class LoteUpdate(BaseModel):
+    area_m2: Optional[int] = None
+    ubicacion: Optional[str] = None
     valor: Optional[Decimal] = None
     estado: Optional[str] = None
+    etapa_id: Optional[int] = None
+
 
 class LoteSell(BaseModel):
     usuario_id: int
