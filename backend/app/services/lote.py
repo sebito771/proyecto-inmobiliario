@@ -119,10 +119,15 @@ class LoteServices:
        if not lote:
           raise HTTPException(status_code=404, detail="Lote not found")
        if lote.estado != "Disponible":
-          raise HTTPException(status_code=400, detail="cannot delete a reserved lote")
+          raise HTTPException(status_code=400, detail="Cannot delete a reserved or sold lote")
+       
+       # Verificar que no haya detalles_compra asociados
+       detalles = self.detalle_repo.get_by_lote_id(lote_id)
+       if detalles:
+          raise HTTPException(status_code=400, detail="Cannot delete lote with associated sales")
        
        self.repo.delete(lote)
-       return {"message": "Lote delete successfully"}
+       return {"message": "Lote deleted successfully"}
        
      
 

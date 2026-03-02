@@ -10,3 +10,6 @@ class DetalleRepository(BaseRepository):
     
     def get_by_compra_id(self,compra_id):
         return self.db.query(DetalleModel).filter(DetalleModel.compra_id == compra_id).all()
+    
+    def get_by_lote_id(self, lote_id):
+        return self.db.query(DetalleModel).filter(DetalleModel.lote_id == lote_id).all()

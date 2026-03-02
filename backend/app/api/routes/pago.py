@@ -15,7 +15,7 @@ def register_payment(
     services: PagoServices = Depends(get_pago_service),
     current_user: UsuarioModel = Depends(get_current_user),
 ):
-    # sólo el propietario de la compra o administrador puede abonar
+    # solo el propietario de la compra o administrador puede abonar
     compra = services.compra_repo.get_by_id(pago.compra_id)
     if not compra:
         raise HTTPException(status_code=404, detail="Compra not found")
@@ -23,3 +23,40 @@ def register_payment(
         raise HTTPException(status_code=403, detail="Not authorized to pay this purchase")
 
     return services.registrar_abono(pago, background_tasks)
+
+
+@router.get("/compra/{compra_id}", response_model=list[Pago])
+def get_pagos_by_compra(
+    compra_id: int,
+    services: PagoServices = Depends(get_pago_service),
+    current_user: UsuarioModel = Depends(get_current_user),
+):
+    """Retorna el historial de pagos de una compra."""
+    compra = services.compra_repo.get_by_id(compra_id)
+    if not compra:
+        raise HTTPException(status_code=404, detail="Compra not found")
+
+    # validar acceso
+    if compra.usuario_id != current_user.id and current_user.rol.nombre != "Administrador":
+        raise HTTPException(status_code=403, detail="Not authorized to view this purchase")
+
+    return services.repo.get_by_compra_id(compra_id)
+
+
+@router.get("/resumen/{compra_id}")
+def get_resumen_compra(
+    compra_id: int,
+    services: PagoServices = Depends(get_pago_service),
+    current_user: UsuarioModel = Depends(get_current_user),
+):
+    """Retorna resumen {total_compra, total_pagado, saldo_pendiente}."""
+    compra = services.compra_repo.get_by_id(compra_id)
+    if not compra:
+        raise HTTPException(status_code=404, detail="Compra not found")
+
+    # validar acceso
+    if compra.usuario_id != current_user.id and current_user.rol.nombre != "Administrador":
+        raise HTTPException(status_code=403, detail="Not authorized to view this purchase")
+
+    return services.get_resumen_compra(compra_id)
+

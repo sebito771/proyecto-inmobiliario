@@ -106,3 +106,14 @@ class PagoServices:
                 asyncio.create_task(send_receipt_email(usuario.email, pdf_bytes))
 
         return pago
+
+    def get_resumen_compra(self, compra_id: int):
+        """Retorna {total_compra, total_pagado, saldo_pendiente}."""
+        compra = self.compra_repo.get_by_id(compra_id)
+        if not compra:
+            raise HTTPException(status_code=404, detail="Compra not found")
+        return {
+            "total_compra": float(compra.total),
+            "total_pagado": float(compra.total) - float(compra.pendiente),
+            "saldo_pendiente": float(compra.pendiente),
+        }
