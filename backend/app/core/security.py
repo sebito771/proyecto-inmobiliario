@@ -115,6 +115,37 @@ def verify_token(
         raise credentials_exception
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict:
-    """Obtiene el usuario actual desde un token de acceso."""
-    return verify_token(token, expected_type="access")
+from sqlalchemy.orm import Session
+from app.database.connection import get_db
+from app.repo import UsuarioRepository
+from app.models.usuario import Usuario as UsuarioModel
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> UsuarioModel:
+    """Obtiene el usuario actual desde un token de acceso y carga la entidad.
+
+    Además verifica que la cuenta esté activa.
+    """
+    payload = verify_token(token, expected_type="access")
+    user_id = payload.get("sub")
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido")
+
+    user = UsuarioRepository(db).get_by_id(int(user_id))
+    if not user or not user.activo:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuario inactivo o no existe")
+
+    return user
+
+
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user: UsuarioModel = Depends(get_current_user)) -> UsuarioModel:
+        if current_user.rol.nombre not in self.allowed_roles:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Rol no autorizado")
+        return current_user
