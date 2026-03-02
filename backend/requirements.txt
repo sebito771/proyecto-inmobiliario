@@ -14,3 +14,5 @@ httpx
 python-jose[cryptography]
 pymysql
 fastapi-mail
+fpdf
+asyncio
