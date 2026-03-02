@@ -41,21 +41,20 @@ class UsuarioServices:
     async def register_user(self, usuario: UsuarioCreate) -> tuple[UsuarioInDB, str]:
         if self.repo.find_by_email(usuario.email):
             raise HTTPException(status_code=400, detail="Email already registered")
-
+        
         password_hash = hash_password(usuario.password)
 
         db_usuario = UsuarioModel(
             nombre=usuario.nombre,
             email=usuario.email,
             password=password_hash,
-            rol_id=usuario.rol_id,
             activo=True,
             is_verified=False
         )
 
         created = self.repo.create(db_usuario)
 
-        verification_token = create_verification_token(created.id, created.email)
+        verification_token = create_verification_token(created.id)
 
         usuario_schema = UsuarioInDB.model_validate(created)
         return usuario_schema, verification_token
