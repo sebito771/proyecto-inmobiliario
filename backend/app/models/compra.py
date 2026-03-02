@@ -19,6 +19,7 @@ class Compra(Base):
     fecha_compra = Column(DateTime, default=datetime.now(timezone.utc))
     fecha_expiracion = Column(DateTime)
     total = Column(Numeric(12, 2), nullable=False)
+    pendiente = Column(Numeric(12, 2), nullable=False)
     estado = Column(Enum(CompraEstado), default=CompraEstado.Activa)
 
     usuario = relationship("Usuario", back_populates="compras")
