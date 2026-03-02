@@ -1,0 +1,5 @@
+from .lote import LoteRepository
+from .usuario import UsuarioRepository
+from .compra import CompraRepository
+from .detalle_compra import DetalleRepository
+from .etapa import EtapaRepository
