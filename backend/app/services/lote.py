@@ -38,7 +38,10 @@ class LoteServices:
     # Ejecutamos la limpieza antes de la lógica principal
      self._clean_expired_purchases()
 
-     for lote_id in sell.lote_id:
+     # Evitar duplicados si el usuario envía el mismo ID varias veces
+     unique_lote_ids = list(set(sell.lote_id))
+
+     for lote_id in unique_lote_ids:
         lote = self.repo.get_by_id(lote_id)
         if not lote or lote.estado != "Disponible":
             raise HTTPException(status_code=400, detail=f"Lote {lote_id} no disponible")
@@ -150,20 +153,21 @@ class LoteServices:
 
 
      try:
-        with self.db.begin():
-            for compra in expired_purchases:
-                #  Obtenemos detalles mediante el repo de detalles
-                detalles = self.detalle_repo.get_by_compra_id(compra.id)
+        for compra in expired_purchases:
+            #  Obtenemos detalles mediante el repo de detalles
+            detalles = self.detalle_repo.get_by_compra_id(compra.id)
+            
+            for item in detalles:
+                lote = self.repo.get_by_id(item.lote_id)
+                if lote and lote.estado == "Reservado":
                 
-                for item in detalles:
-                    lote = self.repo.get_by_id(item.lote_id)
-                    if lote and lote.estado == "Reservado":
-                  
-                        self.repo.update_without_commit(lote, {"estado": "Disponible"})
-                
-                # 4. Cancelamos la compra
-                self.compra_repo.update_without_commit(compra, {"estado": "Cancelada"})
-                
+                    self.repo.update_without_commit(lote, {"estado": "Disponible"})
+            
+            # 4. Cancelamos la compra
+            self.compra_repo.update_without_commit(compra, {"estado": "Cancelada"})
+        
+        self.db.commit()
      except Exception as e:
         # Aquí puedes loguear el error, pero no bloqueamos al usuario
+        self.db.rollback()
         print(f"Error en auto-limpieza: {e}")
