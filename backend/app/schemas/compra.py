@@ -4,6 +4,22 @@ from datetime import datetime
 from decimal import Decimal
 
 
+class DetalleCompraBase(BaseModel):
+    compra_id: int
+    lote_id: int
+    precio: Decimal
+
+
+class DetalleCompraCreate(DetalleCompraBase):
+    pass
+
+
+class DetalleCompra(DetalleCompraBase):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CompraBase(BaseModel):
     usuario_id: int
     total: Decimal
