@@ -2,7 +2,7 @@ from app.repo import LoteRepository , UsuarioRepository , CompraRepository , Det
 from app.schemas.lote import LoteSell , LoteCreate , LoteUpdate
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.models import compra as CompraModel , lote as LoteModel , detalle_compra as DetalleModel 
+from app.models import Compra as CompraModel , Lote as LoteModel , DetalleCompra as DetalleModel 
 from datetime import datetime, timedelta , timezone
 
 
@@ -25,63 +25,64 @@ class LoteServices:
         
 
     def buy_lote(self, sell: LoteSell):
-        """
-        Realiza la compra de lotes y los deja en estado 'Reservado' 🟡
-        """
-        valid_lotes = []
+     """
+    Realiza la compra de lotes y los deja en estado 'Reservado' 🟡
+    """
+     valid_lotes = []
+    
+    # 1. Verificaciones previas (Usuario y Disponibilidad) 👤
+     user = self.user_repo.get_by_id(sell.usuario_id)
+     if not user or not user.activo:
+            raise HTTPException(status_code=400, detail="inactive user")
+
+    # Ejecutamos la limpieza antes de la lógica principal
+     self._clean_expired_purchases()
+
+     for lote_id in sell.lote_id:
+        lote = self.repo.get_by_id(lote_id)
+        if not lote or lote.estado != "Disponible":
+            raise HTTPException(status_code=400, detail=f"Lote {lote_id} no disponible")
+        valid_lotes.append(lote)
+
+     total = sum(lote.valor for lote in valid_lotes)
+
+     try:
+        # --- INICIO DEL BLOQUE ATÓMICO ---
+        ahora = datetime.now(timezone.utc)
+        expiracion = ahora + timedelta(hours=24)
+        nueva_compra = CompraModel(
+            usuario_id=sell.usuario_id,
+            total=total,
+            fecha_compra=ahora,
+            fecha_expiracion=expiracion,
+            estado="Activa"
+        )
+   
+        compradb = self.compra_repo.create_without_commit(nueva_compra)
         
-        # 1. Verificación del Usuario 👤
-        user = self.user_repo.find_by_id(sell.usuario_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        if not user.activo:
-            raise HTTPException(status_code=400, detail="User not active")
+        # B. Forzar el envío a la DB para obtener el ID de la compra 🆔
+        # Esto permite que los detalles tengan el ID de compra sin cerrar la transacción.
+        self.db.flush()
 
-        # 2. Verificación de Disponibilidad 🏗️
-        self._clean_expired_purchases()
-        for lote_id in sell.lote_id:
-            lote = self.repo.get_by_id(lote_id)
-            if not lote:
-                raise HTTPException(status_code=404, detail=f"Lote {lote_id} not found")
-            if lote.estado != "Disponible":
-                raise HTTPException(status_code=400, detail=f"Lote {lote_id} not available")
-            valid_lotes.append(lote)
+        # C. Crear los detalles y actualizar lotes 🔄
+        for lote in valid_lotes:
+            detalle = DetalleModel(
+                compra_id=compradb.id,
+                lote_id=lote.id,
+                precio=lote.valor
+            )
+            self.detalle_repo.create_without_commit(detalle)
+            self.repo.update_without_commit(lote, {"estado": "Reservado"})
 
-        # 3. Cálculo del Total 💰
-        total = sum(lote.valor for lote in valid_lotes)
+        # D. CIERRE ATÓMICO: Si llegamos aquí, todo está bien.
+        self.db.commit() 
+        self.db.refresh(compradb)
+        return compradb
 
-        try:
-            # ⚛️ Iniciamos la transacción: Todo o Nada
-            with self.db.begin():
-                # Crear la cabecera de la compra 🧾
-                ahora = datetime.now(timezone.utc)
-                expiracion = ahora + timedelta(hours=24)
-                nueva_compra = CompraModel(
-                    usuario_id=sell.usuario_id,
-                    total=total,
-                    fecha_compra=ahora,
-                    fecha_expiracion=expiracion,
-                    estado="Activa"
-                )
-                compradb = self.compra_repo.create_without_commit(nueva_compra)
-
-             
-                for lote in valid_lotes:
-                    detalle = DetalleModel(
-                        compra_id=compradb.id,
-                        lote_id=lote.id,
-                        precio=lote.valor
-                    )
-                    self.detalle_repo.create_without_commit(detalle)
-
-                    #  Actualización estratégica: Reservado
-                    self.repo.update(lote, {"estado": "Reservado"})
-
-            return compradb
-
-        except Exception as e:
-            # Si algo falla, SQLAlchemy hace rollback automáticamente
-            raise HTTPException(status_code=500, detail=f"Error en la transacción: {str(e)}")
+     except Exception as e:
+        # Si CUALQUIER cosa falla arriba, deshacemos TODO lo que se hizo en esta sesión.
+        self.db.rollback() 
+        raise HTTPException(status_code=500, detail=f"Error in transaction: {str(e)}")
         
     def create_lote(self, lote_data: LoteCreate):
     # 1. Verificar si la etapa existe 🔍
@@ -103,11 +104,21 @@ class LoteServices:
     def update_lote(self, lote_id: int, updates: LoteUpdate):
        lote= self.repo.get_by_id(lote_id)
        if not lote:
-            raise HTTPException(status_code=404, detail="Lote no encontrado")
+            raise HTTPException(status_code=404, detail="Lote not found")
        
        update_data = updates.model_dump(exclude_unset=True)
        self.repo.update(lote, update_data)
        return lote
+    
+    def delete_lote(self, lote_id: int):
+       lote= self.repo.get_by_id(lote_id)
+       if not lote:
+          raise HTTPException(status_code=404, detail="Lote not found")
+       if lote.estado != "Disponible":
+          raise HTTPException(status_code=400, detail="cannot delete a reserved lote")
+       
+       self.repo.delete(lote)
+       return {"message": "Lote delete successfully"}
        
      
 
@@ -120,7 +131,7 @@ class LoteServices:
      if etapa_id:
         etapa = self.etapa_repo.get_by_id(etapa_id)
         if not etapa:
-            raise HTTPException(status_code=404, detail="Etapa no encontrada")
+            raise HTTPException(status_code=404, detail="Etapa not found")
      
      return self.repo.list_filtered(estado, etapa_id)
     
