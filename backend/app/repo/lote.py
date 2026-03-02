@@ -1,5 +1,5 @@
 from app.repo.base_repo import BaseRepository
-from app.models import lote as LoteModel
+from app.models.lote import Lote as LoteModel
 
 
 class LoteRepository(BaseRepository):
