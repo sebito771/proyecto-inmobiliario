@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
-from app.services import UsuarioServices , LoteServices , PqrsServices , RolServices , DetalleCompraServices
-from app.repo import UsuarioRepository , LoteRepository , CompraRepository , DetalleRepository , EtapaRepository , PqrsRepository , RolRepository
+from app.services import UsuarioServices , LoteServices , PqrsServices , RolServices , DetalleCompraServices , PagoServices
+from app.repo import UsuarioRepository , LoteRepository , CompraRepository , DetalleRepository , EtapaRepository , PqrsRepository , RolRepository , PagoRepository
 
 
 
@@ -37,3 +37,12 @@ def get_detalle_compra_service(db: Session = Depends(get_db)) -> DetalleCompraSe
     compra_repo = CompraRepository(db)
     lote_repo = LoteRepository(db)
     return DetalleCompraServices(repo, compra_repo, lote_repo)
+
+
+def get_pago_service(db: Session = Depends(get_db)) -> PagoServices:
+    repo = PagoRepository(db)
+    compra_repo = CompraRepository(db)
+    detalle_repo = DetalleRepository(db)
+    lote_repo = LoteRepository(db)
+    user_repo = UsuarioRepository(db)
+    return PagoServices(repo, compra_repo, detalle_repo, lote_repo, user_repo, db)
