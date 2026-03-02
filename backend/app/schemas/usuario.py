@@ -42,3 +42,17 @@ class UsuarioInDB(UsuarioBase):
 
 class Usuario(UsuarioInDB):
     pass
+
+
+class RolBase(BaseModel):
+    nombre: str
+
+
+class RolCreate(RolBase):
+    pass
+
+
+class Rol(RolBase):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
