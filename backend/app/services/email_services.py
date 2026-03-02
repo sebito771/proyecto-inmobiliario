@@ -63,3 +63,25 @@ async def send_new_password_email(email: str, token: str, background_tasks: Back
     else:
         await fm.send_message(message)
 
+
+async def send_receipt_email(email: str, pdf_bytes: bytes, background_tasks: BackgroundTasks | None = None):
+    """Envía un correo con el recibo PDF adjunto."""
+    message = MessageSchema(
+        subject="Recibo de pago",
+        recipients=[email],
+        body="Adjunto encontrarás tu recibo de pago.",
+        subtype="plain",
+        attachments=[
+            {
+                "fileName": "recibo.pdf",
+                "data": pdf_bytes,
+            }
+        ],
+    )
+
+    fm = FastMail(MAIL_CONFIG)
+    if background_tasks:
+        background_tasks.add_task(fm.send_message, message)
+    else:
+        await fm.send_message(message)
+
