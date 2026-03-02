@@ -56,6 +56,7 @@ class LoteServices:
         nueva_compra = CompraModel(
             usuario_id=sell.usuario_id,
             total=total,
+            pendiente=total,
             fecha_compra=ahora,
             fecha_expiracion=expiracion,
             estado="Activa"
