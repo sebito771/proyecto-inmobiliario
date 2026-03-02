@@ -1,5 +1,5 @@
 from app.repo.base_repo import BaseRepository
-from app.models import etapas as EtapaModel
+from app.models.etapas import Etapa as EtapaModel
 
 
 
