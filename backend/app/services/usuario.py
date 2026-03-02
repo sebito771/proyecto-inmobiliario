@@ -87,7 +87,7 @@ class UsuarioServices:
         return UsuarioInDB.model_validate(db_usuario)
         
 
-    async def reset_password(self, token: str, new_password: str):
+    def reset_password(self, token: str, new_password: str):
     # 1. Validamos que el token sea de tipo password_reset
      payload = verify_token(token, expected_type="password_reset")
      user_id = payload.get("sub")
