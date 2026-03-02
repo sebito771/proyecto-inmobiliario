@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from app.api.routes import auth 
-# ,usuarios, lotes, compras, pagos, pqrs
+from dotenv import load_dotenv
 
+# ,usuarios, lotes, compras, pagos, pqrs
+load_dotenv()
 app = FastAPI()
 #active
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
