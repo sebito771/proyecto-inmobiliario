@@ -5,53 +5,72 @@ Este proyecto es un backend para un sistema inmobiliario desarrollado con FastAP
 
 ## Estructura del Proyecto
 ```
-proyecto-inmobiliario
 backend
 ├── app
 │   ├── __init__.py
 │   ├── main.py
 │   ├── api
 │   │   ├── __init__.py
-│   │   ├── routes
-│   │   │   ├── __init__.py
-│   │   │   ├── usuarios.py
-│   │   │   ├── lotes.py
-│   │   │   ├── compras.py
-│   │   │   ├── pagos.py
-│   │   │   └── pqrs.py
-│   │   └── dependencies.py
-│   ├── models
-│   │   ├── __init__.py
-│   │   ├── usuario.py
-│   │   ├── lote.py
-│   │   ├── compra.py
-│   │   ├── pago.py
-│   │   └── pqrs.py
-│   ├── schemas
-│   │   ├── __init__.py
-│   │   ├── usuario.py
-│   │   ├── lote.py
-│   │   ├── compra.py
-│   │   ├── pago.py
-│   │   └── pqrs.py
-│   ├── crud
-│   │   ├── __init__.py
-│   │   ├── usuario.py
-│   │   ├── lote.py
-│   │   ├── compra.py
-│   │   ├── pago.py
-│   │   └── pqrs.py
+│   │   ├── dependencies.py
+│   │   └── routes
+│   │       ├── __init__.py
+│   │       ├── auth.py
+│   │       ├── detalle_compra.py
+│   │       ├── lote.py
+│   │       ├── pago.py
+│   │       ├── pqrs.py
+│   │       ├── rol.py
+│   │       └── usuarios.py
 │   ├── core
 │   │   ├── __init__.py
 │   │   ├── config.py
 │   │   └── security.py
-│   └── database
+│   ├── database
+│   │   ├── __init__.py
+│   │   └── connection.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── compra.py
+│   │   ├── detalle_compra.py
+│   │   ├── etapas.py
+│   │   ├── lote.py
+│   │   ├── pago.py
+│   │   ├── pqrs.py
+│   │   ├── rol.py
+│   │   └── usuario.py
+│   ├── repo
+│   │   ├── __init__.py
+│   │   ├── base_repo.py
+│   │   ├── compra.py
+│   │   ├── detalle_compra.py
+│   │   ├── etapa.py
+│   │   ├── lote.py
+│   │   ├── pago.py
+│   │   ├── pqrs.py
+│   │   ├── rol.py
+│   │   └── usuario.py
+│   ├── schemas
+│   │   ├── __init__.py
+│   │   ├── compra.py
+│   │   ├── lote.py
+│   │   ├── pago.py
+│   │   ├── pqrs.py
+│   │   └── usuario.py
+│   └── services
 │       ├── __init__.py
-│       └── connection.py
+│       ├── detalle_compra.py
+│       ├── email_services.py
+│       ├── lote.py
+│       ├── pago.py
+│       ├── pqrs.py
+│       ├── rol.py
+│       └── usuario.py
 ├── database
-│   └── db.sql
+│   ├── db.sql
+│   └── seed.py
 ├── requirements.txt
 ├── .env
+├── .env.example
 ├── .gitignore
 └── README.md
 ```
@@ -76,6 +95,18 @@ backend
    ```
 
 4. Configura las variables de entorno en el archivo `.env`.
+
+
+5. carga el sql en tu gestor de base de datos
+### Creacion de la base de datos
+```bash
+backend/database/db.sql 
+```
+### Carga de seed para la base de datos
+```bash
+backend/database/seed.py
+py seed.py 
+```
 
 ## Uso
 Para iniciar el servidor, ejecuta:
