@@ -1,10 +1,24 @@
 from fastapi import FastAPI
 from app.api.routes import auth , lote, pqrs, rol, detalle_compra, pago, usuarios
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # ,usuarios, , compras, pagos, 
 load_dotenv()
 app = FastAPI()
+
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # lista de URLs permitidas
+    allow_credentials=True,  # si quieres enviar cookies
+    allow_methods=["*"],     # GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],     # Headers permitidos
+)
+
 #active
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 #inactive
