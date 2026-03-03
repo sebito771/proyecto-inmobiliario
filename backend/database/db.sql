@@ -1,30 +1,21 @@
-
 DROP DATABASE IF EXISTS sistema_inmobiliario;
 CREATE DATABASE sistema_inmobiliario;
 USE sistema_inmobiliario;
 
--- =========================
 -- ROLES
--- =========================
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO roles (nombre) VALUES 
-('Administrador'),
-('Cliente');
-
--- =========================
 -- USUARIOS
--- =========================
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     activo BOOLEAN DEFAULT TRUE,
     is_verified BOOLEAN DEFAULT FALSE,
-    password VARCHAR(255) NOT NULL, -- preparado para bcrypt
+    password VARCHAR(255) NOT NULL,
     rol_id INT NOT NULL,
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (rol_id) REFERENCES roles(id)
@@ -32,29 +23,14 @@ CREATE TABLE usuarios (
         ON UPDATE CASCADE
 );
 
-INSERT INTO usuarios (nombre, email, password, rol_id, activo, is_verified) VALUES
-('Admin Sistema', 'admin@inmobiliaria.com', 'hash_admin', 1, TRUE, TRUE),
-('Juan Perez', 'juan@email.com', 'hash_juan', 2, TRUE, TRUE),
-('Maria Lopez', 'maria@email.com', 'hash_maria', 2, TRUE, TRUE);
-
--- =========================
 -- ETAPAS
--- =========================
 CREATE TABLE etapas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion TEXT
 );
 
-INSERT INTO etapas (nombre, descripcion) VALUES
-('Lanzamiento','Inicio oficial del proyecto'),
-('Preventa','Venta anticipada de lotes'),
-('Construccion','Etapa de construcción'),
-('Entrega','Entrega formal al propietario');
-
--- =========================
 -- LOTES
--- =========================
 CREATE TABLE lotes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     area_m2 INT NOT NULL CHECK (area_m2 BETWEEN 100 AND 200),
@@ -67,35 +43,21 @@ CREATE TABLE lotes (
         ON UPDATE CASCADE
 );
 
-INSERT INTO lotes (area_m2, ubicacion, valor, etapa_id) VALUES
-(120,'Sector Norte',45000000,1),
-(150,'Sector Sur',60000000,2),
-(180,'Sector Este',75000000,3),
-(200,'Sector Oeste',90000000,4);
-
--- =========================
 -- COMPRAS
--- =========================
 CREATE TABLE compras (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     fecha_compra TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_expiracion TIMESTAMP NOT NULL,
+    fecha_expiracion TIMESTAMP NULL,
     total DECIMAL(12,2) NOT NULL,
-    pendiente DECIMAL(12,2) NOT NULL,
+    pendiente DECIMAL(12,2) NULL,
     estado ENUM('Activa','Pagada','Cancelada') DEFAULT 'Activa',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
-INSERT INTO compras (usuario_id, total) VALUES
-(2,45000000),
-(3,60000000);
-
--- =========================
 -- DETALLE COMPRA
--- =========================
 CREATE TABLE detalle_compra (
     id INT AUTO_INCREMENT PRIMARY KEY,
     compra_id INT NOT NULL,
@@ -109,15 +71,7 @@ CREATE TABLE detalle_compra (
         ON UPDATE CASCADE
 );
 
-INSERT INTO detalle_compra (compra_id, lote_id, precio) VALUES
-(1,1,45000000),
-(2,2,60000000);
-
-UPDATE lotes SET estado='Vendido' WHERE id IN (1,2);
-
--- =========================
 -- PAGOS
--- =========================
 CREATE TABLE pagos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     compra_id INT NOT NULL,
@@ -129,14 +83,7 @@ CREATE TABLE pagos (
         ON UPDATE CASCADE
 );
 
-INSERT INTO pagos (compra_id, valor_pagado, comprobante) VALUES
-(1,10000000,'pago1.pdf'),
-(1,15000000,'pago2.pdf'),
-(2,20000000,'pago3.pdf');
-
--- =========================
 -- PQRS
--- =========================
 CREATE TABLE pqrs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -148,7 +95,3 @@ CREATE TABLE pqrs (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
-
-INSERT INTO pqrs (usuario_id, tipo, descripcion) VALUES
-(2,'Peticion','Solicito informacion sobre mi saldo'),
-(3,'Queja','No he recibido mi comprobante');
