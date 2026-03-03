@@ -60,3 +60,12 @@ def get_resumen_compra(
 
     return services.get_resumen_compra(compra_id)
 
+
+@router.get("/mis-compras")
+def get_mis_compras(
+    services: PagoServices = Depends(get_pago_service),
+    current_user: UsuarioModel = Depends(get_current_user),
+):
+    """Retorna todas las compras del usuario autenticado."""
+    return services.compra_repo.get_by_usuario_id(current_user.id)
+

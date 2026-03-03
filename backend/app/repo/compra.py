@@ -11,3 +11,9 @@ class CompraRepository(BaseRepository):
             CompraModel.estado == "Activa"
         ).all()
 
+    def get_by_usuario_id(self, usuario_id: int):
+        """Obtiene todas las compras de un usuario específico."""
+        return self.db.query(CompraModel).filter(
+            CompraModel.usuario_id == usuario_id
+        ).all()
+
