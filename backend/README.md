@@ -104,7 +104,7 @@ backend/database/db.sql
 ```
 ### Carga de seed para la base de datos
 ```bash
-backend/database/seed.py
+backend/database
 py seed.py 
 ```
 
