@@ -13,8 +13,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://inmobiliaria-front-lime.vercel.app"],  # lista de URLs permitidas
-    allow_credentials=True,  # si quieres enviar cookies
+    allow_origins=["*"],  # lista de URLs permitidas
+    allow_credentials=False,  # si quieres enviar cookies
     allow_methods=["*"],     # GET, POST, PUT, DELETE, etc.
     allow_headers=["*"],     # Headers permitidos
 )
