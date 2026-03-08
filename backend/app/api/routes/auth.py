@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks , HTTPException
 from app.schemas.usuario import  UsuarioCreate, UsuarioLogin , UsuarioResetPassword
 from app.services.usuario import UsuarioServices
 from app.services.email_services import send_verification_email, send_new_password_email
-from app.core.security import get_current_user , create_password_reset_token
+from app.core.security import get_current_user, create_password_reset_token, verify_token
 from app.api.dependencies import get_usuario_service
 
 
@@ -22,8 +22,8 @@ async def Register(u:UsuarioCreate, background_tasks: BackgroundTasks, services:
 
 @router.post("/verify")
 def activate(token: str, services: UsuarioServices = Depends(get_usuario_service)):
-   data= get_current_user(token,"verification")
-   usuario_id= data.get("sub")
+   data = verify_token(token, expected_type="verification")
+   usuario_id = data.get("sub")
    if not usuario_id:
       raise HTTPException(status_code=400, detail="Invalid token")
    u=services.activate_user(usuario_id)
