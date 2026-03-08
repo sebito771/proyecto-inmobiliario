@@ -5,6 +5,7 @@ from pydantic import ConfigDict
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
+    BASE_URL: str
 
     # JWT
     SECRET_KEY: str

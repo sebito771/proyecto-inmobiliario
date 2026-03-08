@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recibo de pago</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif; }
+    .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .header { background-color: #2e7d32; padding: 32px 24px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px; }
+    .body { padding: 32px 24px; color: #333333; }
+    .body p { font-size: 16px; line-height: 1.6; }
+    .info-box { background-color: #f9f9f9; border-left: 4px solid #2e7d32; padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
+    .info-box p { margin: 6px 0; font-size: 15px; }
+    .info-box span { font-weight: bold; color: #2e7d32; }
+    .footer { background-color: #f4f4f4; text-align: center; padding: 16px; font-size: 12px; color: #888888; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>Recibo de Pago</h1>
+    </div>
+    <div class="body">
+      <p>Hola <strong>{{ nombre }}</strong>,</p>
+      <p>Tu pago ha sido procesado exitosamente. Encontrarás tu recibo en el archivo adjunto de este correo.</p>
+      <div class="info-box">
+        <p>Número de referencia: <span>{{ referencia }}</span></p>
+        <p>Fecha: <span>{{ fecha }}</span></p>
+        <p>Monto: <span>{{ monto }}</span></p>
+        <p>Lote: <span>{{ lote }}</span></p>
+      </div>
+      <p>Si tienes alguna pregunta sobre este pago, no dudes en contactarnos.</p>
+      <p>Gracias por tu confianza.</p>
+    </div>
+    <div class="footer">
+      &copy; {{ year }} Inmobiliaria. Todos los derechos reservados.
+    </div>
+  </div>
+</body>
+</html>

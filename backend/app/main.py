@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from app.api.routes import auth , lote, pqrs, rol, detalle_compra, pago, usuarios
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 # ,usuarios, , compras, pagos, 
 load_dotenv()
 app = FastAPI()
+
+# Servir archivos estáticos (páginas de verificación / reset password)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 
