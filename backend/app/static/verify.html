@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verificación de cuenta</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .card { background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 48px 40px; max-width: 440px; width: 100%; text-align: center; }
+    .icon { font-size: 56px; margin-bottom: 16px; }
+    h1 { font-size: 22px; margin-bottom: 12px; color: #222; }
+    p  { font-size: 15px; color: #555; line-height: 1.6; }
+    #status { margin-top: 16px; font-size: 14px; color: #888; }
+    .success { color: #2e7d32 !important; }
+    .error   { color: #c62828 !important; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" id="icon">⏳</div>
+    <h1 id="title">Verificando tu cuenta…</h1>
+    <p id="msg">Por favor espera un momento.</p>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token  = params.get("token");
+
+      if (!token) {
+        document.getElementById("icon").textContent  = "❌";
+        document.getElementById("title").textContent = "Enlace inválido";
+        document.getElementById("msg").textContent   = "No se encontró el token de verificación.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`/auth/verify?token=${encodeURIComponent(token)}`, { method: "POST" });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+          document.getElementById("icon").textContent  = "✅";
+          document.getElementById("title").textContent = "¡Cuenta verificada!";
+          document.getElementById("msg").textContent   = data.message ?? "Tu cuenta ha sido verificada exitosamente.";
+          document.getElementById("msg").className     = "success";
+        } else {
+          throw new Error(data.detail ?? "Error al verificar");
+        }
+      } catch (err) {
+        document.getElementById("icon").textContent  = "❌";
+        document.getElementById("title").textContent = "Error de verificación";
+        document.getElementById("msg").textContent   = err.message;
+        document.getElementById("msg").className     = "error";
+      }
+    })();
+  </script>
+</body>
+</html>
