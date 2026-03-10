@@ -27,6 +27,7 @@ MAIL_CONFIG = ConnectionConfig(
     MAIL_SSL_TLS=bool(os.getenv("MAIL_SSL_TLS", "False").lower() in ("true", "1")),
     USE_CREDENTIALS=True,
     TEMPLATE_FOLDER=None,  # renderizado manual con Jinja2
+    TIMEOUT=60
 )
 
 
