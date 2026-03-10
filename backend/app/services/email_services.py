@@ -76,7 +76,11 @@ async def send_new_password_email(
     )
     fm = FastMail(MAIL_CONFIG)
     if background_tasks:
+      try:
         background_tasks.add_task(fm.send_message, message)
+        print("email enviado teoricamente")
+      except Exception as e:
+          print("ha habido un error al enviar el email", e)
     else:
         await fm.send_message(message)
 
