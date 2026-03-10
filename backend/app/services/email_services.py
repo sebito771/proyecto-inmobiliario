@@ -1,4 +1,5 @@
 import os
+import logging
 from io import BytesIO
 from pathlib import Path
 from datetime import datetime
@@ -6,6 +7,8 @@ from fastapi import BackgroundTasks
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from starlette.datastructures import UploadFile
 import dotenv
+
+logger = logging.getLogger(__name__)
 
 dotenv.load_dotenv()
 
@@ -53,6 +56,8 @@ async def send_verification_email(
         subtype="html",
     )
     fm = FastMail(MAIL_CONFIG)
+    logger.info(f"Enviando correo de verificación a {email}")
+    logger.info(f"MAIL_CONFIG: {MAIL_CONFIG.__dict__}")
     if background_tasks:
         background_tasks.add_task(fm.send_message, message)
     else:
