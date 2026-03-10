@@ -15,6 +15,8 @@ from app.utils.claims import get_claims
 invalid_credentials = HTTPException(status_code=401, detail="Invalid credentials")
 account_inactive = HTTPException(status_code=403, detail="Account is not active")
 account_not_verified = HTTPException(status_code=403, detail="Account is not verified,check your email")
+account_vefified = HTTPException(status_code=403, detail="Account is already verified")
+
 
 
 
@@ -58,6 +60,16 @@ class UsuarioServices:
 
         usuario_schema = UsuarioInDB.model_validate(created)
         return usuario_schema, verification_token
+     
+    async def retry_verification(self , email: str) -> str:
+        db_usuario = self.repo.find_by_email(email)
+        if not db_usuario:
+            raise HTTPException(status_code=404, detail="User not found")
+        if db_usuario.is_verified:
+            raise account_vefified
+        verification_token = create_verification_token(db_usuario.id)
+        return verification_token
+
 
     def update_user(self, usuario_id: int, updates: UsuarioUpdate) -> UsuarioInDB:
         db_usuario = self.repo.get_by_id(usuario_id)
