@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from app.api.routes import auth , lote, pqrs, rol, detalle_compra, pago, usuarios
+from app.api.routes import auth , lote, pqrs, rol, detalle_compra, pago, usuarios, email
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 #inactive
 #app.include_router(usuarios.router, prefix="/usuarios", tags=["usuarios"])
+app.include_router(email.router, prefix="/email",tags=["email"])
 app.include_router(lote.router, prefix="/lotes", tags=["lotes"])
 app.include_router(pqrs.router, prefix="/pqrs", tags=["pqrs"])
 app.include_router(rol.router, prefix="/roles", tags=["roles"])
