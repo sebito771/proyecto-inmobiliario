@@ -12,7 +12,7 @@ router = APIRouter( tags=["auth"])
 @router.post("/login")
 def Login(u: UsuarioLogin,services: UsuarioServices = Depends(get_usuario_service)):
   tk= services.login_user(u.email, u.password)
-  return {"login successfuly":tk}
+  return {"token":tk}
 
 @router.post("/register")
 async def Register(u:UsuarioCreate, background_tasks: BackgroundTasks, services: UsuarioServices = Depends(get_usuario_service)):
